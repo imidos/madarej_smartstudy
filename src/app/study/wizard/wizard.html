@@ -1,0 +1,245 @@
+<a class="skip-link" href="#study-content" (click)="skipToContent($event)"
+  >انتقل إلى بيانات الدراسة</a
+>
+<header class="site-header">
+  <a class="brand" href="/study" aria-label="مدارج، دراسة الجدوى"
+    ><span class="brand-symbol" aria-hidden="true"><i></i><i></i></span
+    ><span><strong>مدارج</strong><small>للاستشارات الإدارية والمالية</small></span></a
+  >
+  <div class="header-divider"></div>
+  <span class="product-name">الجدوى الذكية</span>
+  <span class="header-tag"><span aria-hidden="true">◈</span> مساحة تخطيط مشروعك</span>
+</header>
+<main class="page-container">
+  <div class="breadcrumb">
+    <span>الجدوى الذكية</span><span aria-hidden="true">/</span><strong>دراسة جديدة</strong>
+  </div>
+  <div class="page-intro">
+    <div>
+      <div class="eyebrow"><span></span> من فكرة إلى خطة واضحة</div>
+      <h1>خطوتك الأولى نحو مشروع مدروس<span class="title-dot">.</span></h1>
+      <p>أخبرنا عن مشروعك، خطوة بخطوة. كل تفصيلة تضيفها تصنع صورة أوضح لقرارك.</p>
+    </div>
+    <span class="study-type">دراسة فنية <span aria-hidden="true">＋</span> مالية</span>
+  </div>
+  @if (!store.ready()) {
+    <div class="loading" role="status">جارٍ فتح مسودة الدراسة…</div>
+  } @else {
+    @if (store.notice()) {
+      <div class="notice" [class.error-note]="store.loadFailed()" role="status">
+        {{ store.notice() }}
+        @if (store.loadFailed()) {
+          <button type="button" class="text-button" (click)="store.load()">
+            إعادة محاولة فتح المسودة
+          </button>
+        }
+      </div>
+    }
+    <div class="wizard-layout">
+      <aside class="study-sidebar" aria-label="مراحل الدراسة">
+        <div class="sidebar-heading">
+          <span>خطوات الدراسة</span><span class="step-count">{{ store.step() + 1 }} / 9</span>
+        </div>
+        <nav aria-label="خطوات نموذج دراسة الجدوى">
+          <ol class="steps-list">
+            @for (step of steps; track $index; let i = $index) {
+              <li>
+                <button
+                  type="button"
+                  [class.active]="store.step() === i"
+                  [class.complete]="store.validSteps()[i] || (i === 8 && store.completed())"
+                  [attr.aria-current]="store.step() === i ? 'step' : null"
+                  [disabled]="store.busy()"
+                  (click)="navigate(i)"
+                >
+                  <span class="step-number" aria-hidden="true">{{
+                    store.validSteps()[i] || (i === 8 && store.completed()) ? '✓' : i + 1
+                  }}</span
+                  ><span>{{ step.title }}</span>
+                  @if (store.step() === i) {
+                    <span class="active-dot" aria-hidden="true"></span>
+                  }
+                </button>
+              </li>
+            }
+          </ol>
+        </nav>
+        <div class="sidebar-progress">
+          <div>
+            <span>اكتمال البيانات</span><strong>{{ store.progress() }}٪</strong>
+          </div>
+          <progress
+            [value]="store.progress()"
+            max="100"
+            aria-label="نسبة اكتمال بيانات الدراسة"
+          ></progress>
+        </div>
+        <div class="sidebar-help">
+          <span class="help-icon" aria-hidden="true">✧</span><strong>خُذ وقتك في التفاصيل</strong>
+          <p>تُحفظ مسودتك تلقائياً على هذا الجهاز، لتعود وتكمل عندما تكون مستعداً.</p>
+        </div>
+      </aside>
+      <section id="study-content" class="form-panel" aria-labelledby="step-title" tabindex="-1">
+        <header class="panel-header">
+          <div>
+            <span class="step-kicker">الخطوة {{ store.step() + 1 }} من ٩</span>
+            <h2 id="step-title" tabindex="-1">{{ current().title }}</h2>
+            <p>{{ current().description }}</p>
+          </div>
+          <span class="panel-icon" aria-hidden="true">{{ current().icon }}</span>
+        </header>
+        <form (submit)="$event.preventDefault(); advance()" novalidate>
+          <fieldset [disabled]="store.busy()" class="step-fieldset">
+            <legend class="visually-hidden">{{ current().title }}</legend>
+            <div class="panel-content">
+              @if (store.completed() && store.step() === 8) {
+                <div class="completion" role="status">
+                  <span aria-hidden="true">✓</span>
+                  <h3 id="completion-title" tabindex="-1">
+                    بيانات الدراسة مكتملة ومحفوظة على هذا الجهاز
+                  </h3>
+                  <p>يمكنك مراجعتها وتعديلها من الأقسام أدناه. لم يُنشأ تقرير بعد.</p>
+                </div>
+              }
+              @if (attempted() && currentIssues().length) {
+                <div id="step-errors" class="error-note" role="alert" tabindex="-1">
+                  يرجى استكمال الحقول الموضّحة أدناه قبل المتابعة.
+                  @for (issue of currentIssues(); track $index) {
+                    @if (issue.path.at(-1) === 'items' || issue.path.at(-1) === 'competitors') {
+                      <p>{{ issue.message }}</p>
+                    }
+                  }
+                </div>
+              }
+              @switch (store.step()) {
+                @case (0) {
+                  <app-overview />
+                }
+                @case (1) {
+                  <app-market />
+                }
+                @case (2) {
+                  <app-operations />
+                }
+                @case (3) {
+                  <app-staff />
+                }
+                @case (4) {
+                  <app-products />
+                }
+                @case (5) {
+                  <app-expenses />
+                }
+                @case (6) {
+                  <app-investment />
+                }
+                @case (7) {
+                  <app-financing />
+                }
+                @case (8) {
+                  <app-review (edit)="navigate($event)" />
+                }
+              }
+              @if (store.step() > 2 && store.step() < 8) {
+                <p class="calculation-note">
+                  تتحدث المجاميع مع إدخال البيانات؛ لا تعني القيمة صفر اكتمال الحقول الفارغة.
+                </p>
+              }
+            </div>
+            <footer class="panel-footer">
+              <div
+                class="save-status"
+                role="status"
+                [class.save-error]="store.saveState() === 'error'"
+              >
+                <span
+                  class="save-dot"
+                  [class.saved]="store.saveState() === 'saved'"
+                  aria-hidden="true"
+                ></span
+                ><span
+                  >{{ saveLabel() }}
+                  @if (store.saveState() === 'saved' && savedTime()) {
+                    <small>آخر حفظ {{ savedTime() }}</small>
+                  }
+                </span>
+              </div>
+              <div class="navigation-actions">
+                @if (store.step() > 0) {
+                  <button
+                    type="button"
+                    class="button secondary"
+                    (click)="navigate(store.step() - 1)"
+                  >
+                    السابق
+                  </button>
+                }
+                <button
+                  class="button primary"
+                  type="submit"
+                  [disabled]="
+                    store.busy() ||
+                    (store.step() === 8 && (store.completed() || store.loadFailed()))
+                  "
+                >
+                  {{
+                    store.busy()
+                      ? 'جارٍ الحفظ…'
+                      : store.step() === 8
+                        ? store.completed()
+                          ? 'تم الحفظ'
+                          : 'حفظ الدراسة المكتملة'
+                        : 'حفظ ومتابعة'
+                  }}
+                  @if (store.step() < 8) {
+                    <span aria-hidden="true">←</span>
+                  }
+                </button>
+              </div>
+            </footer>
+          </fieldset>
+        </form>
+        @if (store.saveState() === 'error' && !store.loadFailed()) {
+          <div class="error-note storage-error" role="alert">
+            تعذر حفظ التغييرات. احتفظ بهذه الصفحة مفتوحة وأعد المحاولة.<button
+              type="button"
+              class="text-button"
+              (click)="store.saveNow()"
+            >
+              إعادة محاولة الحفظ
+            </button>
+          </div>
+        }
+      </section>
+    </div>
+    <div class="workspace-footer">
+      <p>
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+        تُحفظ بياناتك محلياً في هذا المتصفح فقط
+      </p>
+      <button
+        type="button"
+        class="text-button danger"
+        [disabled]="store.busy()"
+        (click)="discard()"
+      >
+        حذف المسودة
+      </button>
+    </div>
+  }
+</main>
+<footer class="site-footer">
+  <span>مدارج <span class="footer-dot">·</span> نحو قرارات أكثر وضوحاً</span
+  ><span>دراسة الجدوى الفنية والمالية</span>
+</footer>
