@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "node scripts/prepare-config.mjs && ng build",
     "package:release": "npm run build && node scripts/package-release.mjs",
     "release": "npm test -- --watch=false && npm run package:release",
     "verify:release": "node scripts/verify-release.mjs",
