@@ -109,7 +109,7 @@ export class StudyStore {
   }
   snapshot(): FeasibilityStudyDraft {
     return {
-      version: 1,
+      version: 2,
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: new Date().toISOString(),
@@ -147,6 +147,7 @@ export class StudyStore {
     this.saveTimer = undefined;
   }
   touchStep(step: number): void {
+    this.form.assumptions().markAsTouched();
     const section = SECTION_KEYS[step];
     if (section) this.form[section]().markAsTouched();
   }
@@ -207,6 +208,20 @@ export class StudyStore {
       this.notice.set('تعذر حذف المسودة. لم تتغير بياناتك.');
       this.saveState.set('error');
       return false;
+    } finally {
+      this.ready.set(true);
+    }
+  }
+  async importDraft(draft: FeasibilityStudyDraft): Promise<void> {
+    this.cancelPendingSave();
+    this.ready.set(false);
+    ++this.generation;
+    try {
+      await this.queue.catch(() => undefined);
+      await this.repository.save(draft);
+      this.completedModel.set(undefined);
+      this.completedLogo.set(undefined);
+      await this.load();
     } finally {
       this.ready.set(true);
     }

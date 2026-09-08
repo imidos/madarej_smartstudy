@@ -4,6 +4,7 @@ import { StudyStore } from '../study-store';
 import { DraftRepository } from '../draft-repository';
 import { validDraft } from '../testing/study-fixture';
 import { STEPS } from '../study-model';
+import { provideRouter } from '@angular/router';
 
 describe('Wizard screens', () => {
   const repository = { load: vi.fn(), save: vi.fn(), delete: vi.fn() };
@@ -12,7 +13,7 @@ describe('Wizard screens', () => {
     repository.save.mockResolvedValue(undefined);
     TestBed.configureTestingModule({
       imports: [Wizard],
-      providers: [{ provide: DraftRepository, useValue: repository }],
+      providers: [provideRouter([]), { provide: DraftRepository, useValue: repository }],
     });
   });
   afterEach(() => {

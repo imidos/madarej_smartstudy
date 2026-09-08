@@ -10,9 +10,23 @@ import { Expenses } from '../steps/expenses/expenses';
 import { Investment } from '../steps/investment/investment';
 import { Financing } from '../steps/financing/financing';
 import { Review } from '../steps/review/review';
+import { ForecastFields } from '../ui/forecast-fields';
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-wizard',
-  imports: [Overview, Market, Operations, Staff, Products, Expenses, Investment, Financing, Review],
+  imports: [
+    Overview,
+    Market,
+    Operations,
+    Staff,
+    Products,
+    Expenses,
+    Investment,
+    Financing,
+    Review,
+    ForecastFields,
+    RouterLink,
+  ],
   templateUrl: './wizard.html',
 })
 export class Wizard implements OnInit {
@@ -40,7 +54,7 @@ export class Wizard implements OnInit {
       : '',
   );
   ngOnInit(): void {
-    void this.store.load();
+    if (!this.store.ready()) void this.store.load();
   }
   skipToContent(event: Event): void {
     event.preventDefault();
@@ -78,7 +92,7 @@ export class Wizard implements OnInit {
   async discard(): Promise<void> {
     if (
       !window.confirm(
-        'سيتم حذف المسودة وشعار المشروع من هذا الجهاز نهائياً. هل تريد بدء دراسة جديدة؟',
+        'سيتم حذف المسودة والشعار وكل التقارير ومراحل الإعداد المحفوظة على هذا الجهاز نهائياً. صدّر ما تحتاجه أولاً. هل تريد بدء دراسة جديدة؟',
       )
     )
       return;

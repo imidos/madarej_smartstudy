@@ -1,8 +1,19 @@
 // Local-only accessibility harness. It is never part of the application build.
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { build } from 'esbuild';
 import { resolve, extname, sep } from 'node:path';
 const root = resolve('dist/feasibility/browser');
+const csp = (await readFile('deployment/web.config', 'utf8')).match(
+  /name="Content-Security-Policy" value="([^"]+)"/,
+)[1];
+const fixture = await build({
+  entryPoints: ['scripts/report-fixture.ts'],
+  bundle: true,
+  write: false,
+  format: 'esm',
+  platform: 'browser',
+});
 const scanner = `
 const button = document.createElement('button');
 button.id = 'qa-scan'; button.textContent = 'Run accessibility check';
@@ -27,10 +38,32 @@ const mime = {
   '.ico': 'image/x-icon',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.json': 'application/json',
+  '.ttf': 'font/ttf',
 };
 createServer(async (request, response) => {
+  response.setHeader('Content-Security-Policy', csp);
+  response.setHeader('X-Content-Type-Options', 'nosniff');
   try {
     const url = new URL(request.url, 'http://127.0.0.1:4201');
+    if (url.pathname === '/__qa/fixture.js') {
+      response.setHeader('Content-Type', 'text/javascript');
+      response.end(fixture.outputFiles[0].contents);
+      return;
+    }
+    if (url.pathname === '/__qa/pdf' && request.method === 'POST') {
+      const parts = [];
+      let size = 0;
+      for await (const part of request) {
+        size += part.length;
+        if (size > 30000000) throw new Error('too-large');
+        parts.push(part);
+      }
+      await mkdir('tmp/pdfs', { recursive: true });
+      await writeFile('tmp/pdfs/representative.pdf', Buffer.concat(parts));
+      response.end('saved');
+      return;
+    }
     if (url.pathname === '/__qa/axe.js') {
       response.setHeader('Content-Type', 'text/javascript');
       response.end(await readFile('node_modules/axe-core/axe.min.js'));
@@ -55,7 +88,7 @@ createServer(async (request, response) => {
           .toString()
           .replace(
             '</body>',
-            '<script defer src="/__qa/axe.js"></script><script defer src="/__qa/scan.js"></script></body>',
+            '<script defer src="/__qa/axe.js"></script><script defer src="/__qa/scan.js"></script><script type="module" src="/__qa/fixture.js"></script></body>',
           ),
       );
     response.setHeader('Content-Type', mime[extname(path)] ?? 'application/octet-stream');

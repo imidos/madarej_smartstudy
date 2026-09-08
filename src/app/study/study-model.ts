@@ -1,3 +1,4 @@
+import { newAssumptions, ProjectionAssumptions } from './projection-assumptions';
 export interface Competitor {
   id: string;
   name: string;
@@ -18,6 +19,9 @@ export interface Product {
   sales: string;
   capacity: string;
   growth: string;
+  priceGrowth: string;
+  costGrowth: string;
+  capacityGrowth: string;
   materials: string;
   labor: string;
   commissions: string;
@@ -37,8 +41,12 @@ export interface Asset {
   name: string;
   quantity: string;
   cost: string;
+  depreciable: boolean;
+  usefulLife: string;
+  residualValue: string;
 }
 export interface StudyData {
+  assumptions: ProjectionAssumptions;
   project: {
     name: string;
     sector: string;
@@ -87,7 +95,7 @@ export interface Logo {
   blob: Blob;
 }
 export interface FeasibilityStudyDraft {
-  version: 1;
+  version: 2;
   id: string;
   data: StudyData;
   step: number;
@@ -96,6 +104,7 @@ export interface FeasibilityStudyDraft {
   updatedAt: string;
   logo?: Logo;
 }
+export type FeasibilityStudyDraftV2 = FeasibilityStudyDraft;
 export const newId = () => crypto.randomUUID();
 export const newCompetitor = (): Competitor => ({ id: newId(), name: '', strength: '' });
 export const newEmployee = (): Employee => ({
@@ -113,6 +122,9 @@ export const newProduct = (): Product => ({
   sales: '',
   capacity: '',
   growth: '',
+  priceGrowth: '',
+  costGrowth: '',
+  capacityGrowth: '',
   materials: '',
   labor: '',
   commissions: '',
@@ -127,6 +139,9 @@ export const newExpense = (): Expense => ({
   period: 'monthly',
 });
 export const newAsset = (): Asset => ({
+  depreciable: false,
+  usefulLife: '',
+  residualValue: '0',
   id: newId(),
   category: 'equipment',
   name: '',
@@ -135,6 +150,7 @@ export const newAsset = (): Asset => ({
 });
 export function newStudy(): StudyData {
   return {
+    assumptions: newAssumptions(),
     project: {
       name: '',
       sector: '',

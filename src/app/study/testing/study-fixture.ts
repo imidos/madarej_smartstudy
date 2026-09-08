@@ -1,6 +1,9 @@
-import { FeasibilityStudyDraft, newStudy, StudyData } from '../study-model';
+import { FeasibilityStudyDraft, newAsset, newStudy, StudyData } from '../study-model';
 export function validStudy(manufacturing = false): StudyData {
   const d = newStudy();
+  d.assumptions.startDate = '2026-10-01';
+  d.assumptions.profitTax = '0';
+  d.assumptions.discountRate = '10';
   d.project = {
     name: 'مشروع تجريبي',
     sector: manufacturing ? 'manufacturing' : 'service',
@@ -42,6 +45,9 @@ export function validStudy(manufacturing = false): StudyData {
       sales: '100',
       capacity: '200',
       growth: '5',
+      priceGrowth: '',
+      costGrowth: '',
+      capacityGrowth: '',
       materials: '10',
       labor: '5',
       commissions: '2',
@@ -53,7 +59,14 @@ export function validStudy(manufacturing = false): StudyData {
     { id: 'expense-1', category: 'rent', name: 'إيجار المكتب', amount: '12000', period: 'yearly' },
   ];
   d.investment.items = [
-    { id: 'asset-1', category: 'equipment', name: 'أجهزة', quantity: '2', cost: '10000' },
+    {
+      ...newAsset(),
+      id: 'asset-1',
+      category: 'equipment',
+      name: 'أجهزة',
+      quantity: '2',
+      cost: '10000',
+    },
   ];
   d.investment.deposits = '1000';
   d.investment.inventory = '2000';
@@ -63,7 +76,7 @@ export function validStudy(manufacturing = false): StudyData {
 }
 export function validDraft(): FeasibilityStudyDraft {
   return {
-    version: 1,
+    version: 2,
     id: 'draft-1',
     data: validStudy(),
     step: 4,

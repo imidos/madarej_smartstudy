@@ -1,0 +1,309 @@
+<a class="skip-link" href="/report#report-main">انتقل إلى الدراسة</a>
+<header class="report-header">
+  <a routerLink="/study" class="brand">مدارج</a><a routerLink="/study">العودة إلى بيانات المشروع</a>
+</header>
+<main id="report-main" class="report-workspace" tabindex="-1">
+  <section class="report-toolbar" aria-labelledby="report-heading">
+    <p class="eyebrow">من الفكرة إلى القرار</p>
+    <h1 id="report-heading">دراسة الجدوى الفنية والمالية</h1>
+    <p>
+      راجع افتراضاتك، ثم أعد دراسة عربية مبنية على بياناتك وحسابات المشروع. تُرسل بيانات الدراسة إلى
+      OpenRouter ومزوّد النموذج عند بدء الإعداد.
+    </p>
+    <div class="report-actions">
+      <button
+        class="button primary"
+        [disabled]="
+          store.busy() ||
+          !store.study.ready() ||
+          store.study.issues().length > 0 ||
+          store.reports().length >= 2 ||
+          (!!store.report() && !store.stale())
+        "
+        (click)="generate()"
+      >
+        {{
+          store.run() && store.run()?.status !== 'complete'
+            ? 'استئناف إعداد الدراسة'
+            : store.report()
+              ? 'إعداد المراجعة النهائية'
+              : 'إعداد الدراسة'
+        }}
+      </button>
+      @if (store.busy()) {
+        <button class="button secondary" (click)="store.cancel()">إيقاف الإعداد</button>
+      }
+      <button
+        class="button secondary"
+        [disabled]="store.busy() || !store.study.ready()"
+        (click)="backup()"
+      >
+        نسخة احتياطية للمدخلات
+      </button>
+      <label class="backup-control"
+        >استيراد المدخلات<input
+          type="file"
+          accept="application/json,.json"
+          [disabled]="store.busy()"
+          (change)="restore($event)"
+      /></label>
+    </div>
+    <p class="report-disclosure">
+      تقرير أول ومراجعة ناجحة واحدة على هذا الجهاز. إعادة المحاولة والتنزيل لا تستهلك المراجعة.
+      النسخة الاحتياطية تشمل المدخلات والشعار؛ احتفظ بالتقرير عبر PDF.
+    </p>
+    <p role="status" aria-live="polite">{{ store.message() }} {{ notice() }}</p>
+    @if (store.busy()) {
+      <p role="status">{{ store.stageLabel() }}</p>
+      <ol class="generation-stages">
+        @for (stage of stages; track stage.id; let i = $index) {
+          <li [class.done]="i < (store.run()?.stage ?? 0)">
+            {{ i < (store.run()?.stage ?? 0) ? '✓' : '○' }} {{ stage.label }}
+          </li>
+        }
+      </ol>
+    }
+    @if (store.study.issues().length) {
+      <details class="error-note" open>
+        <summary>بيانات تتطلب المراجعة ({{ store.study.issues().length }})</summary>
+        <ul>
+          @for (issue of store.study.issues(); track $index) {
+            <li>
+              <a routerLink="/study" (click)="edit(issue.step)">{{ issue.message }}</a>
+            </li>
+          }
+        </ul>
+      </details>
+    }
+    @if (reportStale()) {
+      <p class="error-note">
+        هذه النسخة لا تطابق المدخلات الحالية. الأرقام أدناه تخص بيانات الإصدار المحفوظ.
+      </p>
+    }
+    @if (store.reports().length >= 2) {
+      <p>اكتملت المراجعة المتاحة. تظل النسختان متاحتين للقراءة والتنزيل.</p>
+    }
+  </section>
+  @if (report(); as r) {
+    <div class="report-actions">
+      <label
+        >نسخة الدراسة
+        <select [value]="r.id" (change)="selectVersion($event)">
+          @for (version of store.reports(); track version.id) {
+            <option [value]="version.id">
+              النسخة {{ version.revision }} — {{ version.createdAt.slice(0, 10) }}
+            </option>
+          }
+        </select></label
+      ><button class="button primary" [disabled]="exporting()" (click)="pdf()">
+        {{ exporting() ? 'جارٍ تجهيز PDF…' : 'تنزيل الدراسة PDF' }}
+      </button>
+    </div>
+    <div class="report-layout">
+      <nav class="report-nav" aria-label="أقسام الدراسة">
+        <a href="/report#report-cover">بيانات الإصدار</a>
+        @for (id of ids; track id) {
+          <a [href]="'/report#section-' + id">{{ titles[id] }}</a>
+        }
+        <a href="/report#report-assumptions">الافتراضات</a
+        ><a href="/report#report-financials">القوائم والرسوم</a
+        ><a href="/report#report-sources">المصادر والمنهجية</a>
+      </nav>
+        <article class="report-document">
+          @if (fixture()) {
+            <p class="report-fixture-warning" role="alert">
+              عينة تحقق محلية: هذه ليست دراسة مولدة ولا يجوز استخدامها لاتخاذ قرار استثماري.
+            </p>
+          }
+        <section id="report-cover" class="report-cover">
+          <p>مدارج · النسخة {{ r.revision }}</p>
+          <h2>{{ r.snapshot.data.project.name }}</h2>
+          <p>
+            {{ r.snapshot.data.project.country }} · {{ r.snapshot.data.project.city }} ·
+            {{ r.snapshot.data.project.currency }}
+          </p>
+          <p>
+            الفترة: {{ r.snapshot.data.project.years }} سنوات من
+            {{ r.snapshot.data.assumptions.startDate }} — الإصدار {{ r.createdAt.slice(0, 10) }}
+          </p>
+          <p>معرّف المدخلات: <bdi>{{ r.inputHash.slice(0, 12) }}</bdi></p>
+          <p>النموذج المسجل: <bdi>{{ modelNames() }}</bdi></p>
+          <p>
+            تقديرات تخطيطية لا تضمن الربحية. الحسابات حتمية من مدخلات العميل؛ التحليل النصي مولّد
+            بالذكاء الاصطناعي.
+          </p>
+          @if (!r.researchPerformed) {
+            <p>
+              لم يُنفذ بحث سوقي خارجي. المعلومات السوقية تقديرات العميل وتوصيات تحتاج إلى تحقق
+              مستقل.
+            </p>
+          }
+        </section>
+        @for (section of sections(); track section.id) {
+          <section [id]="'section-' + section.id">
+            <h2>{{ titles[section.id] }}</h2>
+            @for (paragraph of section.paragraphs; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+            <ul>
+              @for (bullet of section.bullets; track $index) {
+                <li>{{ bullet }}</li>
+              }
+            </ul>
+            @if (section.metricIds.length) {
+              <dl class="report-metrics report-section-metrics" aria-label="الأرقام المعتمدة للحساب">
+                @for (metricId of section.metricIds; track metricId) {
+                  @if (metrics()[metricId]; as metric) {
+                    <div>
+                      <dt>{{ metric.label }} — {{ metric.period }}</dt>
+                      <dd>{{ format(metric.value) }} {{ metric.unit }}</dd>
+                    </div>
+                  }
+                }
+              </dl>
+            }
+            @for (source of r.evidence; track source.id) {
+              @if (section.sourceIds.includes(source.id)) {
+                <a [href]="source.url" target="_blank" rel="noopener noreferrer">{{
+                  source.title
+                }}</a>
+              }
+            }
+          </section>
+        }
+        <section id="report-assumptions">
+          <h2>الافتراضات المعتمدة</h2>
+          <details open>
+            <summary>القيم التي استندت إليها الحسابات</summary>
+            <dl class="assumption-list">
+              @for (field of assumptions; track field.key) {
+                <div>
+                  <dt>{{ field.label }}</dt>
+                  <dd>{{ r.snapshot.data.assumptions[field.key] || 'لم يحدد' }}</dd>
+                </div>
+              }
+            </dl>
+          </details>
+          @if (caveats().length) {
+            <details class="error-note" open>
+              <summary>حدود المدخلات التي يلزم التحقق منها</summary>
+              <ul>
+                @for (caveat of caveats(); track caveat) {
+                  <li>{{ caveat }}</li>
+                }
+              </ul>
+            </details>
+          }
+        </section>
+        <section id="report-financials">
+          <h2>القوائم المالية والمؤشرات</h2>
+          <p>
+            جميع المبالغ بعملة {{ r.snapshot.data.project.currency }}. المبيعات دون ضريبة المبيعات،
+            والميزانية المبسطة لا تشمل حساب تسوية تلك الضريبة.
+          </p>
+          @for (scenario of r.projection.scenarios; track scenario.id) {
+            <details [open]="scenario.id === 'base'">
+              <summary>
+                {{
+                  scenario.id === 'base'
+                    ? 'السيناريو الأساسي'
+                    : scenario.id === 'optimistic'
+                      ? 'السيناريو المتفائل'
+                      : 'السيناريو المتحفظ'
+                }}
+              </summary>
+              <dl class="report-metrics">
+                <div>
+                  <dt>صافي القيمة الحالية للمشروع</dt>
+                  <dd>{{ format(scenario.project.npv) }}</dd>
+                </div>
+                <div>
+                  <dt>العائد الداخلي السنوي (%)</dt>
+                  <dd>
+                    {{
+                      scenario.project.irrStatus === 'ambiguous'
+                        ? 'ملتبس: تغيرات متعددة في إشارة التدفقات'
+                        : format(scenario.project.irr)
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>الاسترداد بالأشهر</dt>
+                  <dd>
+                    {{
+                      scenario.project.paybackMonths === null
+                        ? 'لم يتحقق'
+                        : format(scenario.project.paybackMonths)
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>فجوة السيولة</dt>
+                  <dd>{{ format(scenario.fundingShortfall) }}</dd>
+                </div>
+                <div>
+                  <dt>تغطية خدمة الدين</dt>
+                  <dd>{{ format(scenario.dscr) }}</dd>
+                </div>
+                <div>
+                  <dt>تعادل الإيراد السنوي</dt>
+                  <dd>{{ format(scenario.breakEvenRevenue) }}</dd>
+                </div>
+              </dl>
+              @for (warning of scenario.warnings; track $index) {
+                <p class="error-note">{{ warning }}</p>
+              }
+              <app-financial-tables [periods]="scenario.years" title="القوائم السنوية" />
+              <app-projection-details [scenario]="scenario" />
+              <details>
+                <summary>الملحق الشهري</summary>
+                <app-financial-tables [periods]="scenario.months" title="القوائم الشهرية" />
+              </details>
+            </details>
+          }
+          @for (chart of charts(); track chart.id) {
+            <app-report-chart [data]="chart" />
+          }
+        </section>
+        <section id="report-sources">
+          <h2>المصادر والمنهجية</h2>
+          <ul>
+            @for (note of r.projection.methodology; track $index) {
+              <li>{{ note }}</li>
+            }
+          </ul>
+          @for (source of r.evidence; track source.id) {
+            <div>
+              <h3>
+                <a [href]="source.url" target="_blank" rel="noopener noreferrer">{{
+                  source.title
+                }}</a>
+              </h3>
+              <p>
+                {{ source.publisher }} · {{ source.date || 'تاريخ غير محدد' }} · استرجع
+                {{ source.retrievedAt.slice(0, 10) }}
+              </p>
+              <p>{{ source.excerpt }}</p>
+            </div>
+          }
+          <p>
+            النماذج المستخدمة: <bdi>{{ modelNames() }}</bdi>
+          </p>
+          <p>
+            المصادر والمدخلات لا تُعد اعتماداً محاسبياً أو قانونياً. راجع الافتراضات والاشتراطات مع
+            المختصين قبل الالتزام بالاستثمار.
+          </p>
+        </section>
+      </article>
+    </div>
+  } @else {
+    <section class="report-empty">
+      <h2>دراستك تبدأ من بيانات واضحة</h2>
+      <p>
+        استكمل الافتراضات المالية، ثم اضغط «إعداد الدراسة». سيظهر التقرير هنا بعد اعتماد جميع
+        أقسامه.
+      </p>
+      <a routerLink="/study">مراجعة بيانات المشروع</a>
+    </section>
+  }
+</main>

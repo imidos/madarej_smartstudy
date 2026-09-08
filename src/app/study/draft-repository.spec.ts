@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { DraftRepository, isDraft } from './draft-repository';
+import { DraftRepository, isDraft, migrateDraft } from './draft-repository';
 import { validDraft } from './testing/study-fixture';
 
 describe('IndexedDB draft repository', () => {
@@ -30,12 +30,20 @@ describe('IndexedDB draft repository', () => {
   });
   it('rejects unsupported versions, malformed data and duplicate row IDs', () => {
     const d = validDraft();
-    expect(isDraft({ ...d, version: 2 })).toBe(false);
+    expect(isDraft({ ...d, version: 3 })).toBe(false);
     expect(isDraft({ ...d, step: 9 })).toBe(false);
     expect(isDraft({ ...d, data: {} })).toBe(false);
     expect(isDraft({ ...d, updatedAt: 'bad' })).toBe(false);
     d.data.products.items.push({ ...d.data.products.items[0] });
     expect(isDraft(d)).toBe(false);
+  });
+  it('migrates older data and requires review of new assumptions', () => {
+    const previous = { ...validDraft(), version: 1, completed: true };
+    const migrated = migrateDraft(previous);
+    expect(migrated.version).toBe(2);
+    expect(migrated.completed).toBe(false);
+    expect(migrated.data.project).toEqual(previous.data.project);
+    expect(migrated.data.assumptions.profitTax).toBe('');
   });
   it('rejects invalid logo metadata', () => {
     expect(

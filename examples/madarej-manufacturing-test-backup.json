@@ -1,0 +1,190 @@
+{
+  "format": "madarej-study",
+  "version": 1,
+  "draft": {
+    "version": 2,
+    "id": "example-manufacturing-2026",
+    "step": 0,
+    "completed": false,
+    "createdAt": "2026-09-08T10:15:00.000Z",
+    "updatedAt": "2026-09-08T10:15:00.000Z",
+    "data": {
+      "assumptions": {
+        "startDate": "2026-10-01",
+        "rampMonths": "0",
+        "rampPercent": "100",
+        "marketSize": "5000000",
+        "marketYear": "2026",
+        "marketGeography": "الرياض",
+        "sourceLinks": "",
+        "competitorDetails": "منافسون محليون بأسعار أقل وجودة متوسطة، ومتاجر أثاث مستورد بجودة ثابتة وفترة تسليم أطول.",
+        "priceGrowth": "0",
+        "unitCostGrowth": "0",
+        "capacityGrowth": "0",
+        "salaryGrowth": "0",
+        "expenseGrowth": "0",
+        "receivableDays": "30",
+        "inventoryDays": "45",
+        "payableDays": "30",
+        "minimumCash": "0",
+        "profitTax": "0",
+        "discountRate": "10",
+        "terminalRecovery": "0",
+        "optimisticSales": "20",
+        "optimisticCosts": "-10",
+        "pessimisticSales": "-20",
+        "pessimisticCosts": "10"
+      },
+      "project": {
+        "name": "مصنع مدارج للأثاث — عينة اختبار",
+        "sector": "manufacturing",
+        "activity": "تصنيع أثاث مكتبي خشبي",
+        "description": "تصنيع وبيع مكاتب وكراسي مكتبية للشركات الصغيرة والمتوسطة في الرياض.",
+        "country": "SA",
+        "city": "الرياض",
+        "currency": "SAR",
+        "years": "5"
+      },
+      "market": {
+        "customers": "الشركات الصغيرة والمتوسطة، المكاتب الجديدة، ومساحات العمل المشتركة.",
+        "channels": "مندوب مبيعات، موقع إلكتروني، واتساب، وشراكات مع شركات التشطيب.",
+        "advantages": "تصنيع محلي، تسليم أسرع، وإمكانية تفصيل المقاسات.",
+        "none": false,
+        "competitors": [
+          {
+            "id": "competitor-local-workshops",
+            "name": "ورش الأثاث المحلية",
+            "strength": "أسعار أقل وجودة متوسطة"
+          },
+          {
+            "id": "competitor-imported-furniture",
+            "name": "متاجر الأثاث المستورد",
+            "strength": "جودة ثابتة وفترة تسليم أطول"
+          }
+        ]
+      },
+      "operations": {
+        "facilities": "ورشة تصنيع ومخزن",
+        "area": "800",
+        "utilities": "كهرباء ثلاثية الطور، إنترنت، وتهوية",
+        "process": "استلام الطلب، قص الخشب، التجميع، التشطيب، الفحص، ثم التسليم.",
+        "capacity": "100 قطعة يومياً",
+        "materials": "خشب MDF، مسامير، دهانات، وإكسسوارات",
+        "suppliers": "موردو خشب وإكسسوارات محليون",
+        "permits": "رخصة نشاط صناعي وسجل تجاري",
+        "safety": "طفايات حريق، تهوية، ومعدات حماية شخصية",
+        "training": "تدريب السلامة وتشغيل المعدات"
+      },
+      "staff": {
+        "none": false,
+        "items": [
+          {
+            "id": "staff-carpenter",
+            "role": "نجار / فني تصنيع",
+            "count": "2",
+            "salary": "3000",
+            "additional": "500"
+          },
+          {
+            "id": "staff-operations-manager",
+            "role": "مدير تشغيل",
+            "count": "1",
+            "salary": "4000",
+            "additional": "0"
+          }
+        ]
+      },
+      "products": {
+        "items": [
+          {
+            "id": "product-wooden-desk",
+            "name": "مكتب خشبي",
+            "price": "115",
+            "tax": "15",
+            "sales": "100",
+            "capacity": "200",
+            "growth": "5",
+            "priceGrowth": "",
+            "costGrowth": "",
+            "capacityGrowth": "",
+            "materials": "10",
+            "labor": "5",
+            "commissions": "2",
+            "packaging": "1",
+            "other": "2"
+          },
+          {
+            "id": "product-office-chair",
+            "name": "كرسي مكتبي",
+            "price": "230",
+            "tax": "15",
+            "sales": "25",
+            "capacity": "200",
+            "growth": "5",
+            "priceGrowth": "",
+            "costGrowth": "",
+            "capacityGrowth": "",
+            "materials": "10",
+            "labor": "5",
+            "commissions": "2",
+            "packaging": "1",
+            "other": "2"
+          }
+        ]
+      },
+      "expenses": {
+        "none": false,
+        "items": [
+          {
+            "id": "expense-workshop-rent",
+            "category": "rent",
+            "name": "إيجار الورشة",
+            "amount": "12000",
+            "period": "yearly"
+          },
+          {
+            "id": "expense-marketing",
+            "category": "marketing",
+            "name": "تسويق",
+            "amount": "500",
+            "period": "monthly"
+          }
+        ]
+      },
+      "investment": {
+        "none": false,
+        "items": [
+          {
+            "id": "asset-equipment",
+            "category": "equipment",
+            "name": "معدات تصنيع",
+            "quantity": "2",
+            "cost": "10000",
+            "depreciable": true,
+            "usefulLife": "5",
+            "residualValue": "0"
+          },
+          {
+            "id": "asset-furniture",
+            "category": "furniture",
+            "name": "أثاث مكتبي",
+            "quantity": "3",
+            "cost": "1000",
+            "depreciable": false,
+            "usefulLife": "",
+            "residualValue": "0"
+          }
+        ],
+        "deposits": "1000",
+        "inventory": "2000",
+        "reserve": "7000"
+      },
+      "financing": {
+        "contribution": "6000",
+        "interest": "0",
+        "fees": "100",
+        "years": "2"
+      }
+    }
+  }
+}

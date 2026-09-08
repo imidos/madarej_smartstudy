@@ -3,11 +3,14 @@
 # Compiled output
 /dist
 /tmp
+/release
+/tmp-*.log
 /out-tsc
 /bazel-out
 
 # Node
 /node_modules
+/.npm-cache
 npm-debug.log
 yarn-error.log
 
@@ -42,3 +45,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Deployment-supplied browser configuration. Never commit an API key.
+/public/generation-config.json

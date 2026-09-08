@@ -1,0 +1,10 @@
+{
+  "apiKey": "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",
+  "model": "nvidia/nemotron-3-super-120b-a12b:free",
+  "zeroCost": true,
+  "reasoningEffort": "medium",
+  "researchEnabled": false,
+  "researchBudgetUsd": 0,
+  "maxTokens": 12000,
+  "timeoutSeconds": 180
+}

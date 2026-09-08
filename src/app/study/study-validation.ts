@@ -105,6 +105,8 @@ export function studyIssues(data: StudyData): StudyIssue[] {
       number(4, `${path}.${key}`, row[key]);
     number(4, `${path}.tax`, row.tax, { max: 100 });
     number(4, `${path}.growth`, row.growth, { min: -100, max: 1000 });
+    for (const key of ['priceGrowth', 'costGrowth', 'capacityGrowth'] as const)
+      if (row[key].trim()) number(4, `${path}.${key}`, row[key], { min: -100, max: 1000 });
     const sales = parseAmount(row.sales),
       capacity = parseAmount(row.capacity);
     if (sales && capacity && sales.gt(capacity))
@@ -150,5 +152,65 @@ export function studyIssues(data: StudyData): StudyIssue[] {
     number(7, 'financing.fees', data.financing.fees);
     number(7, 'financing.years', data.financing.years, { min: 1, max: 30, integer: true });
   }
+  const a = data.assumptions;
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(a.startDate) ||
+    !Number.isFinite(Date.parse(a.startDate)) ||
+    new Date(a.startDate).toISOString().slice(0, 10) !== a.startDate
+  )
+    add(0, 'assumptions.startDate', 'أدخل تاريخ بدء صالحاً بصيغة سنة-شهر-يوم');
+  number(0, 'assumptions.rampMonths', a.rampMonths, { max: 12, integer: true });
+  number(0, 'assumptions.rampPercent', a.rampPercent, { max: 100 });
+  number(1, 'assumptions.marketSize', a.marketSize, { optional: true });
+  number(1, 'assumptions.marketYear', a.marketYear, {
+    optional: true,
+    min: 1900,
+    max: 2200,
+    integer: true,
+  });
+  for (const key of ['marketGeography', 'sourceLinks', 'competitorDetails'] as const)
+    text(1, `assumptions.${key}`, a[key], true);
+  if (
+    a.sourceLinks
+      .split('\n')
+      .filter(Boolean)
+      .some((link) => {
+        try {
+          return !['https:', 'http:'].includes(new URL(link.trim()).protocol);
+        } catch {
+          return true;
+        }
+      })
+  )
+    add(1, 'assumptions.sourceLinks', 'أدخل رابطاً كاملاً في كل سطر');
+  for (const key of ['priceGrowth', 'unitCostGrowth', 'capacityGrowth'] as const)
+    number(4, `assumptions.${key}`, a[key], { min: -100, max: 1000 });
+  number(3, 'assumptions.salaryGrowth', a.salaryGrowth, { min: -100, max: 1000 });
+  number(5, 'assumptions.expenseGrowth', a.expenseGrowth, { min: -100, max: 1000 });
+  for (const key of ['receivableDays', 'inventoryDays', 'payableDays'] as const)
+    number(6, `assumptions.${key}`, a[key], { max: 365 });
+  number(6, 'assumptions.minimumCash', a.minimumCash);
+  for (const key of ['profitTax', 'discountRate', 'terminalRecovery'] as const)
+    number(7, `assumptions.${key}`, a[key], { max: 100 });
+  for (const key of [
+    'optimisticSales',
+    'optimisticCosts',
+    'pessimisticSales',
+    'pessimisticCosts',
+  ] as const)
+    number(7, `assumptions.${key}`, a[key], { min: -100, max: 100 });
+  if (!data.investment.none)
+    data.investment.items.forEach((row, i) => {
+      if (row.depreciable && row.category !== 'establishment') {
+        number(6, `investment.items.${i}.usefulLife`, row.usefulLife, {
+          min: 1,
+          max: 100,
+          integer: true,
+        });
+        number(6, `investment.items.${i}.residualValue`, row.residualValue);
+        if (parseAmount(row.residualValue)?.gt(parseAmount(row.cost) ?? 0))
+          add(6, `investment.items.${i}.residualValue`, 'القيمة المتبقية للوحدة تتجاوز تكلفتها');
+      }
+    });
   return issues;
 }

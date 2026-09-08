@@ -140,6 +140,7 @@
                   <app-review (edit)="navigate($event)" />
                 }
               }
+              <app-forecast-fields [step]="store.step()" />
               @if (store.step() > 2 && store.step() < 8) {
                 <p class="calculation-note">
                   تتحدث المجاميع مع إدخال البيانات؛ لا تعني القيمة صفر اكتمال الحقول الفارغة.
@@ -213,6 +214,7 @@
       </section>
     </div>
     <div class="workspace-footer">
+      <a class="button primary" routerLink="/report">الدراسة والتقارير والنسخ الاحتياطية</a>
       <p>
         <svg
           width="15"

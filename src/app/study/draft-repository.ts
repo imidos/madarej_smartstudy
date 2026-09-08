@@ -1,5 +1,6 @@
 import { Service } from '@angular/core';
 import { FeasibilityStudyDraft, newStudy } from './study-model';
+import { newAssumptions } from './projection-assumptions';
 
 function matchesShape(value: unknown, sample: unknown): boolean {
   if (typeof sample === 'string') return typeof value === 'string' && value.length <= 4000;
@@ -24,7 +25,7 @@ export function isDraft(value: unknown): value is FeasibilityStudyDraft {
   if (!value || typeof value !== 'object') return false;
   const draft = value as Record<string, unknown>;
   if (
-    draft['version'] !== 1 ||
+    draft['version'] !== 2 ||
     typeof draft['id'] !== 'string' ||
     typeof draft['completed'] !== 'boolean' ||
     !Number.isInteger(draft['step']) ||
@@ -55,6 +56,44 @@ export function isDraft(value: unknown): value is FeasibilityStudyDraft {
   return true;
 }
 
+export function migrateDraft(value: unknown): FeasibilityStudyDraft {
+  if (isDraft(value)) return value;
+  if (!value || typeof value !== 'object') throw new Error('invalid-draft');
+  const legacy = value as Record<string, unknown>;
+  if (legacy['version'] !== 1 || !legacy['data'] || typeof legacy['data'] !== 'object')
+    throw new Error('invalid-draft');
+  const data = legacy['data'] as Record<string, unknown>;
+  const investment = data['investment'] as Record<string, unknown> | undefined;
+  const products = data['products'] as Record<string, unknown> | undefined;
+  if (!products || !Array.isArray(products['items'])) throw new Error('invalid-draft');
+  if (!investment || !Array.isArray(investment['items'])) throw new Error('invalid-draft');
+  const migrated = {
+    ...legacy,
+    version: 2,
+    completed: false,
+    data: {
+      ...data,
+      products: {
+        ...products,
+        items: products['items'].map((item: unknown) => {
+          if (!item || typeof item !== 'object') throw new Error('invalid-draft');
+          return { priceGrowth: '', costGrowth: '', capacityGrowth: '', ...item };
+        }),
+      },
+      assumptions: newAssumptions(),
+      investment: {
+        ...investment,
+        items: investment['items'].map((item: unknown) => {
+          if (!item || typeof item !== 'object') throw new Error('invalid-draft');
+          return { depreciable: false, usefulLife: '', residualValue: '0', ...item };
+        }),
+      },
+    },
+  };
+  if (!isDraft(migrated)) throw new Error('invalid-draft');
+  return migrated;
+}
+
 @Service()
 export class DraftRepository {
   private async database(): Promise<IDBDatabase> {
@@ -73,7 +112,7 @@ export class DraftRepository {
       };
     });
   }
-  private async transaction<T>(
+  async transaction<T>(
     mode: IDBTransactionMode,
     operation: (store: IDBObjectStore) => IDBRequest<T>,
   ): Promise<T> {
@@ -93,14 +132,13 @@ export class DraftRepository {
   async load(): Promise<FeasibilityStudyDraft | undefined> {
     const result: unknown = await this.transaction('readonly', (store) => store.get('active'));
     if (result === undefined) return undefined;
-    if (!isDraft(result)) throw new Error('invalid-draft');
-    return result;
+    return migrateDraft(result);
   }
   async save(draft: FeasibilityStudyDraft): Promise<void> {
     if (!isDraft(draft)) throw new Error('invalid-draft');
     await this.transaction('readwrite', (store) => store.put(draft, 'active'));
   }
   async delete(): Promise<void> {
-    await this.transaction('readwrite', (store) => store.delete('active'));
+    await this.transaction('readwrite', (store) => store.clear());
   }
 }

@@ -1,0 +1,145 @@
+{
+  "format": "madarej-study",
+  "version": 1,
+  "draft": {
+    "version": 2,
+    "id": "example-service-2026",
+    "data": {
+      "assumptions": {
+        "startDate": "2026-10-01",
+        "rampMonths": "0",
+        "rampPercent": "100",
+        "marketSize": "",
+        "marketYear": "",
+        "marketGeography": "",
+        "sourceLinks": "",
+        "competitorDetails": "",
+        "priceGrowth": "0",
+        "unitCostGrowth": "0",
+        "capacityGrowth": "0",
+        "salaryGrowth": "0",
+        "expenseGrowth": "0",
+        "receivableDays": "0",
+        "inventoryDays": "0",
+        "payableDays": "0",
+        "minimumCash": "0",
+        "profitTax": "0",
+        "discountRate": "10",
+        "terminalRecovery": "0",
+        "optimisticSales": "20",
+        "optimisticCosts": "-10",
+        "pessimisticSales": "-20",
+        "pessimisticCosts": "10"
+      },
+      "project": {
+        "name": "استوديو مدارج للتصميم — اختبار الإنتاج",
+        "sector": "service",
+        "activity": "خدمات تصميم",
+        "description": "تصميم هويات للشركات الصغيرة",
+        "country": "SA",
+        "city": "الرياض",
+        "currency": "SAR",
+        "years": "5"
+      },
+      "market": {
+        "customers": "شركات صغيرة",
+        "channels": "الموقع الإلكتروني",
+        "advantages": "خدمة متخصصة",
+        "none": true,
+        "competitors": []
+      },
+      "operations": {
+        "facilities": "مكتب",
+        "area": "80",
+        "utilities": "كهرباء وإنترنت",
+        "process": "استلام الطلب ثم التنفيذ والتسليم",
+        "capacity": "",
+        "materials": "",
+        "suppliers": "",
+        "permits": "رخصة نشاط",
+        "safety": "طفايات حريق",
+        "training": "تدريب أولي"
+      },
+      "staff": {
+        "none": false,
+        "items": [
+          {
+            "id": "employee-1",
+            "role": "مصمم",
+            "count": "2",
+            "salary": "3000",
+            "additional": "500"
+          }
+        ]
+      },
+      "products": {
+        "items": [
+          {
+            "id": "product-1",
+            "name": "تصميم هوية",
+            "price": "1150",
+            "tax": "15",
+            "sales": "20",
+            "capacity": "40",
+            "growth": "0",
+            "priceGrowth": "",
+            "costGrowth": "",
+            "capacityGrowth": "",
+            "materials": "0",
+            "labor": "150",
+            "commissions": "50",
+            "packaging": "0",
+            "other": "20"
+          }
+        ]
+      },
+      "expenses": {
+        "none": false,
+        "items": [
+          {
+            "id": "expense-1",
+            "category": "rent",
+            "name": "إيجار المكتب",
+            "amount": "12000",
+            "period": "yearly"
+          },
+          {
+            "id": "marketing",
+            "category": "marketing",
+            "name": "تسويق",
+            "amount": "500",
+            "period": "monthly"
+          }
+        ]
+      },
+      "investment": {
+        "none": false,
+        "items": [
+          {
+            "depreciable": false,
+            "usefulLife": "",
+            "residualValue": "0",
+            "id": "asset-1",
+            "category": "equipment",
+            "name": "أجهزة",
+            "quantity": "2",
+            "cost": "10000"
+          }
+        ],
+        "deposits": "1000",
+        "inventory": "0",
+        "reserve": "9000"
+      },
+      "financing": {
+        "contribution": "30000",
+        "interest": "0",
+        "fees": "0",
+        "years": "2"
+      }
+    },
+    "step": 0,
+    "completed": false,
+    "createdAt": "2026-09-07T12:00:00.000Z",
+    "updatedAt": "2026-09-07T12:00:00.000Z"
+  }
+}

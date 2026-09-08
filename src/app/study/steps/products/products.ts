@@ -57,6 +57,33 @@ import { unitCost } from '../../financials';
           />
         </div>
         <h4 class="subheading">تكلفة الوحدة الواحدة</h4>
+        <details class="forecast-assumptions">
+          <summary>تغيرات سنوية خاصة بهذا المنتج</summary>
+          <p>اتركها فارغة لاستخدام الافتراض العام أدناه. أدخل صفراً لتثبيت القيمة لهذا المنتج.</p>
+          <div class="fields-grid">
+            <app-study-field
+              [id]="'price-growth-' + i"
+              label="التغير السنوي في سعر البيع (%)"
+              [field]="row.priceGrowth"
+              kind="number"
+              [required]="false"
+            />
+            <app-study-field
+              [id]="'cost-growth-' + i"
+              label="التغير السنوي في تكلفة الوحدة (%)"
+              [field]="row.costGrowth"
+              kind="number"
+              [required]="false"
+            />
+            <app-study-field
+              [id]="'capacity-growth-' + i"
+              label="التغير السنوي في الطاقة (%)"
+              [field]="row.capacityGrowth"
+              kind="number"
+              [required]="false"
+            />
+          </div>
+        </details>
         <div class="fields-grid three-columns">
           <app-study-field
             [id]="'product-materials-' + i"

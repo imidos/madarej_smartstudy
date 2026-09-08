@@ -1,0 +1,52 @@
+export interface ProjectionAssumptions {
+  startDate: string;
+  rampMonths: string;
+  rampPercent: string;
+  marketSize: string;
+  marketYear: string;
+  marketGeography: string;
+  sourceLinks: string;
+  competitorDetails: string;
+  priceGrowth: string;
+  unitCostGrowth: string;
+  capacityGrowth: string;
+  salaryGrowth: string;
+  expenseGrowth: string;
+  receivableDays: string;
+  inventoryDays: string;
+  payableDays: string;
+  minimumCash: string;
+  profitTax: string;
+  discountRate: string;
+  terminalRecovery: string;
+  optimisticSales: string;
+  optimisticCosts: string;
+  pessimisticSales: string;
+  pessimisticCosts: string;
+}
+export const newAssumptions = (): ProjectionAssumptions => ({
+  startDate: '',
+  rampMonths: '0',
+  rampPercent: '100',
+  marketSize: '',
+  marketYear: '',
+  marketGeography: '',
+  sourceLinks: '',
+  competitorDetails: '',
+  priceGrowth: '0',
+  unitCostGrowth: '0',
+  capacityGrowth: '0',
+  salaryGrowth: '0',
+  expenseGrowth: '0',
+  receivableDays: '0',
+  inventoryDays: '0',
+  payableDays: '0',
+  minimumCash: '0',
+  profitTax: '',
+  discountRate: '',
+  terminalRecovery: '0',
+  optimisticSales: '20',
+  optimisticCosts: '-10',
+  pessimisticSales: '-20',
+  pessimisticCosts: '10',
+});
